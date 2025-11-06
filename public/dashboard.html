@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MusicStream</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <nav class="navbar dashboard-nav">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-music"></i>
+                <span>MusicStream</span>
+            </div>
+            <div class="nav-links">
+                <span class="user-welcome">Welcome, <span id="user-name">User</span>!</span>
+                <button onclick="logout()" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="featured">
+                    <i class="fas fa-fire"></i> Featured
+                </a>
+                <a href="#" class="menu-item" data-section="playlists">
+                    <i class="fas fa-list-music"></i> My Playlists
+                </a>
+                <a href="#" class="menu-item" data-section="search">
+                    <i class="fas fa-search"></i> Search
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Featured Section -->
+            <section id="featured-section" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-fire"></i> Featured Music</h2>
+                </div>
+                <div id="featured-songs" class="songs-grid">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </section>
+
+            <!-- Playlists Section -->
+            <section id="playlists-section" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list-music"></i> My Playlists</h2>
+                    <button onclick="showCreatePlaylistModal()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Playlist
+                    </button>
+                </div>
+                <div id="playlists-container" class="playlists-grid">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </section>
+
+            <!-- Search Section -->
+            <section id="search-section" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-search"></i> Search Music</h2>
+                </div>
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search for songs, artists, or albums..."
+                    >
+                    <button onclick="searchMusic()" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div id="search-results" class="songs-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>Enter a search term to find music</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Music Player -->
+    <div id="music-player" class="music-player" style="display: none;">
+        <div class="player-info">
+            <img id="player-image" src="" alt="Album Art">
+            <div class="player-details">
+                <div id="player-title" class="player-title">Song Title</div>
+                <div id="player-artist" class="player-artist">Artist</div>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button onclick="previousSong()" class="control-btn">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button onclick="togglePlay()" class="control-btn play-btn" id="play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button onclick="nextSong()" class="control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+        <div class="player-progress">
+            <span id="current-time">0:00</span>
+            <input type="range" id="progress-bar" value="0" min="0" max="100">
+            <span id="duration">0:00</span>
+        </div>
+        <audio id="audio-player"></audio>
+    </div>
+
+    <!-- Create Playlist Modal -->
+    <div id="create-playlist-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Create New Playlist</h3>
+                <button onclick="closeCreatePlaylistModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="create-playlist-form">
+                <div class="form-group">
+                    <label for="playlist-name">Playlist Name</label>
+                    <input 
+                        type="text" 
+                        id="playlist-name" 
+                        placeholder="Enter playlist name"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="playlist-description">Description (Optional)</label>
+                    <textarea 
+                        id="playlist-description" 
+                        placeholder="Enter playlist description"
+                        rows="3"
+                    ></textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="playlist-public">
+                        Make this playlist public
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-check"></i> Create Playlist
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add to Playlist Modal -->
+    <div id="add-to-playlist-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Add to Playlist</h3>
+                <button onclick="closeAddToPlaylistModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="playlist-selection" class="playlist-selection">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading playlists...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
